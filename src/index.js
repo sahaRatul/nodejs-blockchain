@@ -1,7 +1,3 @@
-require('babel-register')({
-    presets: [ 'env' ]
-});
-
 let express = require('express');
 let BlockChain = require('./blockchain');
 
@@ -37,7 +33,7 @@ app.get('/chain', (req, res) => {
 });
 
 app.get('/mine',(req,res) => {
-    //We run the proof of work algorithm to get the next proof...
+    // We run the proof of work algorithm to get the next proof...
     let chain = blockchain.get_chain();
     let last_block = chain[chain.length - 1];
     let last_proof = last_block.proof;
@@ -47,7 +43,7 @@ app.get('/mine',(req,res) => {
     // The sender is "0" to signify that this node has mined a new coin.
     blockchain.new_transaction("0",identifier,1);
 
-    //Forge the new Block by adding it to the chain
+    // Forge the new Block by adding it to the chain
     let previous_hash = BlockChain.default.hash(JSON.stringify(last_block));
     let new_block = blockchain.new_block(proof,previous_hash);
 

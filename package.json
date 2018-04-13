@@ -2,18 +2,23 @@
   "name": "blockchain-api",
   "version": "1.0.0",
   "description": "Demo Blockchain App",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sahaRatul/nodejs-blockchain.git"
+  },
   "main": "index.js",
   "scripts": {
+    "start": "npm run build && node build/index ",
+    "build": "babel src --presets env --out-dir build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ratul Saha",
   "license": "MIT",
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "express": "^4.16.3",
     "sha.js": "^2.4.11"
-  },
-  "devDependencies": {
-    "babel-preset-env": "^1.6.1"
   }
 }
