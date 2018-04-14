@@ -13,12 +13,8 @@ app.use(bodyParser.json());
 app.use(morgan('dev'));
 
 let blockchain = new BlockChain.default();
+let coinbase = new Wallet.default();
 
-/*
-let keys = Utils.default.generateKeyPair();
-let signature = Utils.default.applyECDSASignature(keys.private, "Ratul Saha");
-console.log(Utils.default.verifyECDSASignature(keys.public, "Ratul Saha", signature));
-*/
 
 app.get('/api/blockchain', (req, res) => {
     res.contentType('application/json');
@@ -59,13 +55,27 @@ app.get('/api/wallet', (req, res) => {
     res.send(wallet);
 });
 
+app.get('/api/wallet/balance', (req, res) => {
+    if (req.query.key) {
+        res.contentType('application/json');
+        res.send({
+            balance: Wallet.default.getBalance(req.query.key)
+        });
+    }
+    else {
+        res.status(400).send({
+            message: "key parameter missing in query"
+        });
+    }
+});
+
 app.post('/api/transaction', (req, res) => {
     if (req.body && req.body.sender && req.body.recipient && req.body.asset && req.body.private_key) {
         let transaction = new Transaction.default(req.body.sender, req.body.recipient, req.body.asset);
-        
+
         //Create signature
         let signature = transaction.generateSignature(req.body.sender, req.body.recipient, req.body.asset, req.body.private_key);
-        
+
         //Verify transaction with generated signature
         let verified = transaction.verifySignature(req.body.sender, req.body.recipient, req.body.asset, signature);
         res.contentType('application/json');

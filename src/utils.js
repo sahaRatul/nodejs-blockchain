@@ -62,10 +62,15 @@ class Utils {
             let key = ec.keyFromPublic(publicKey, 'hex');
             //Convert input to byte array
             let inputBytes = input.split('').map((x) => { return x.charCodeAt(0); });
-            
+
             return key.verify(inputBytes, new Buffer(signature));
         }
         return false;
+    }
+
+    static getMerkleRoot(transactions = []) {
+        let count = transactions.length;
+        let previousTreeLayer = transactions.map((x) => { return x; });
     }
 }
 

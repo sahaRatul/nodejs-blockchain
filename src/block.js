@@ -6,6 +6,7 @@ class Block {
         this.previousHash = previousHash;
         this.timeStamp = Date.now();
         this.nonce = 0;
+        this.transactions = [];
         this.hash = this.calculateBlockHash(this.previousHash, this.timeStamp, this.nonce, this.data);
 
         this.calculateBlockHash = this.calculateBlockHash.bind(this);
@@ -25,6 +26,22 @@ class Block {
             this.hash = this.calculateBlockHash();
         }
         return this.hash;
+    }
+
+    addTransaction(transaction) {
+        if (!transaction) {
+            return { error: true, message: "TRANSACTION_DATA_MISSING" };
+        }
+        else if (this.previousHash === "0") {
+            return { error: true, message: "CANNOT_ADD_GENESIS_BLOCK" };
+        }
+        else if (!transaction.processTransaction()) {
+            return { error: true, message: "CANNOT_PROCESS_TRANSACTION" };
+        }
+        else {
+            this.transactions.push(transaction);
+            return { error: false, message: "TRANSACTION_ADDED" };
+        }
     }
 }
 
