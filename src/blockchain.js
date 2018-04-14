@@ -1,66 +1,51 @@
-import sha from 'sha.js';
+import Block from './block';
+import Utils from './utils';
 
 class Blockchain {
     constructor() {
-        this.chain = [];
-        this.current_transaction = [];
+        this.blockchain = [new Block({ _id: Utils.uuid(), message: "Genesis block" }, "0")];
+        this.difficulty = 4;
 
-        this.get_chain = this.get_chain.bind(this);
-        this.get_transactions = this.get_transactions.bind(this);
-        this.new_block = this.new_block.bind(this);
-        this.new_transaction = this.new_transaction.bind(this);
-        this.proof_of_work = this.proof_of_work.bind(this);
-
-        // Create the genesis block
-        this.new_block(100,1);
+        this.addBlock = this.addBlock.bind(this);
+        this.getChain = this.getChain.bind(this);
+        this.isChainValid = this.isChainValid.bind(this);
     }
 
-    get_chain() {
-        return this.chain;
-    }
-
-    get_transactions() {
-        return this.current_transaction;
-    }
-
-    new_block(proof, previous_hash) {
-        let new_block = {
-            index: this.chain.length + 1,
-            timestamp: new Date().toISOString(),
-            transactions: this.current_transaction,
-            proof: proof,
-            previous_hash: previous_hash ? previous_hash : Blockchain.hash(JSON.stringify(this.chain[this.chain.length - 1])),
-        };
-
-        this.current_transaction = [];
-        this.chain.push(new_block);
-        return new_block;
-    }
-
-    new_transaction(sender, recipient, amount) {
-        this.current_transaction.push({
-            sender: sender,
-            recipient: recipient,
-            amount: amount
-        });
-    }
-
-    static hash(block_string) {
-        return new sha.sha256().update(block_string).digest('hex');
-    }
-
-    static valid_proof(last_proof, proof) {
-        let guess = last_proof.toString() + proof.toString();
-        let guess_hash = new sha.sha256().update(guess).digest('hex');
-        return guess_hash.substring(0, 4) === "0000";
-    }
-
-    proof_of_work(last_proof) {
-        let proof = 0;
-        while(!Blockchain.valid_proof(last_proof, proof)) {
-            proof++;
+    addBlock(block) {
+        if (block) {
+            this.blockchain.push(block);
         }
-        return proof;
+        return this.blockchain;
+    }
+
+    getChain() {
+        return this.blockchain;
+    }
+
+    isChainValid(difficulty = this.difficulty) {
+        let currentBlock = undefined;
+        let previousBlock = undefined;
+        let target = new Array(difficulty + 1).join("0");
+
+        for (let i = 1; i < this.blockchain.length - 1; i++) {
+            currentBlock = this.blockchain[i];
+            previousBlock = this.blockchain[i - 1];
+
+            if (currentBlock.hash !== currentBlock.calculateHash()) {
+                console.log("Hash mismatch");
+                return false;
+            }
+            if (currentBlock.previousHash !== previousBlock.calculateHash()) {
+                console.log("Hash mismatch");
+                return false;
+            }
+            if (currentBlock.hash.substr(0, difficulty) !== target) {
+                console.log("This block hasn't been mined");
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 
