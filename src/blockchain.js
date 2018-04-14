@@ -31,11 +31,11 @@ class Blockchain {
             currentBlock = this.blockchain[i];
             previousBlock = this.blockchain[i - 1];
 
-            if (currentBlock.hash !== currentBlock.calculateHash()) {
+            if (currentBlock.hash !== currentBlock.calculateBlockHash()) {
                 console.log("Hash mismatch");
                 return false;
             }
-            if (currentBlock.previousHash !== previousBlock.calculateHash()) {
+            if (currentBlock.previousHash !== previousBlock.calculateBlockHash()) {
                 console.log("Hash mismatch");
                 return false;
             }

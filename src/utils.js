@@ -1,4 +1,5 @@
 import CryptoJS from 'crypto-js';
+import { ec as EC } from 'elliptic';
 
 class Utils {
     static applySha256(input = "") {
@@ -24,6 +25,47 @@ class Utils {
             }
         }
         return uuid.join('');
+    }
+
+    static generateKeyPair() {
+        let ec = new EC('secp256k1');
+        let key = ec.genKeyPair();
+
+        let keys = {
+            public: key.getPublic().encode('hex'),
+            private: key.getPrivate('hex')
+        };
+
+        return keys;
+    }
+
+    static applyECDSASignature(privateKey = "", input = "") {
+        if (privateKey) {
+            let ec = new EC('secp256k1');
+            let key = ec.keyFromPrivate(privateKey);
+            //Convert input to byte array
+            let inputBytes = input.split('').map((x) => { return x.charCodeAt(0); });
+
+            //Sign the input
+            let signature = key.sign(inputBytes);
+
+            //Export DER encoded signature in Array
+            let derSign = signature.toDER();
+            return derSign;
+        }
+        return null;
+    }
+
+    static verifyECDSASignature(publicKey = "", input = "", signature = []) {
+        if (signature.length !== 0 && publicKey) {
+            let ec = new EC('secp256k1');
+            let key = ec.keyFromPublic(publicKey, 'hex');
+            //Convert input to byte array
+            let inputBytes = input.split('').map((x) => { return x.charCodeAt(0); });
+            
+            return key.verify(inputBytes, new Buffer(signature));
+        }
+        return false;
     }
 }
 
