@@ -1,5 +1,6 @@
 import Blockchain from './blockchain';
 import Transaction from './transaction';
+import TransactionInput from './transaction-input';
 import Utils from './utils';
 
 class Wallet {
@@ -9,13 +10,27 @@ class Wallet {
         this.privateKey = keys.private;
         this.publicKey = keys.public;
         this.UTXOs = new Map();
+
+        this.getBalance = this.getBalance.bind(this);
+        this.sendAsset = this.sendAsset.bind(this);
     }
 
-    static getBalance(publicKey = this.publicKey) {
+    getBalance(publicKey = this.publicKey) {
         let count = 0;
         for (let [key, value] of Blockchain.UTXOs) {
             if (value.isMine(publicKey)) {
-                this.UTXOs ? this.UTXOs.set(key, value) : () => { };
+                this.UTXOs.set(key, value);
+                count++;
+            }
+        }
+        return count;
+    }
+
+    static getBalanceStatic(publicKey) {
+        let count = 0;
+        for (let [key, value] of Blockchain.UTXOs) {
+            key;
+            if (value.isMine(publicKey)) {
                 count++;
             }
         }
@@ -23,20 +38,29 @@ class Wallet {
     }
 
     sendAsset(recipient = "", asset = { _id: "" }) {
-        if (Wallet.getBalance(this.publicKey) < 1) {
-            return null;
+        if (this.getBalance(this.publicKey) < 1) {
+            return { error: true, message: "NO_ASSETS_AVAILABLE" };
         }
 
         let inputs = [];
+        let len = 0;
+        let filtered = [];
         for (let [key, value] of this.UTXOs) {
-            inputs.push(value);
+            let transactionInput = new TransactionInput(value.id);
+            inputs.push(transactionInput);
             key;
-            let len = value.assets.filter((x) => { x._id === asset._id });
+            filtered = value.assets.filter((x) => { return x._id === asset._id });
+            len = filtered.length;
             if (len > 0) break;
         }
+        if (len === 0) {
+            return { error: true, message: "ASSET_NOT_AVAILABLE" };
+        }
 
-        let newTransaction = new Transaction(this.publicKey, recipient, asset, inputs);
-        return newTransaction;
+        let newTransaction = new Transaction(this.publicKey, recipient, filtered[0], inputs);
+        newTransaction.generateSignature(this.privateKey);//Sign the transaction
+
+        return { error: false, message: "ASSET_SENT", transaction: newTransaction };
     }
 }
 

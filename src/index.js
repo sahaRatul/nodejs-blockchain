@@ -22,7 +22,12 @@ app.use(morgan('dev'));
 let blockchain = new BlockChain.default();
 let coinbase = new Wallet.default(); //Default wallet
 
-WalletList.default.wallets = [{ _id: coinbase._id, publicKey: coinbase.publicKey }];
+// eslint-disable-next-line no-console
+console.log(coinbase.publicKey);
+// eslint-disable-next-line no-console
+console.log(coinbase.privateKey);
+
+WalletList.default.wallets = [coinbase];
 
 //Create genesis Transaction
 let genesisTransaction = new Transaction.default(coinbase.publicKey, coinbase.publicKey, Assets[0], null);
@@ -81,21 +86,22 @@ app.get('/api/wallet', (req, res) => {
     let wallet = new Wallet.default();
     res.contentType('application/json');
     let walletList = WalletList.default.wallets;
-    walletList.push({ _id: wallet._id, publicKey: wallet.publicKey });
+    walletList.push(wallet);
     WalletList.default.wallets = walletList;
     res.send(wallet);
 });
 
 app.get('/api/wallets', (req, res) => {
     res.contentType('application/json');
-    res.send(WalletList.default.wallets);
+    let walletList = WalletList.default.wallets.map((x) => { return { _id: x.id, publicKey: x.publicKey }; })
+    res.send(walletList);
 });
 
 app.get('/api/wallet/balance', (req, res) => {
     if (req.query.key) {
         res.contentType('application/json');
         res.send({
-            balance: Wallet.default.getBalance(req.query.key)
+            balance: Wallet.default.getBalanceStatic(req.query.key)
         });
     }
     else {
@@ -107,18 +113,23 @@ app.get('/api/wallet/balance', (req, res) => {
 
 app.post('/api/transaction', (req, res) => {
     if (req.body && req.body.sender && req.body.recipient && req.body.asset && req.body.private_key) {
-        let transaction = new Transaction.default(req.body.sender, req.body.recipient, req.body.asset);
-
-        //Create signature
-        let signature = transaction.generateSignature(req.body.sender, req.body.recipient, req.body.asset, req.body.private_key);
-
-        //Verify transaction with generated signature
-        let verified = transaction.verifySignature(req.body.sender, req.body.recipient, req.body.asset, signature);
-        res.contentType('application/json');
-        res.send({
-            message: "Transaction created",
-            verified: verified
-        });
+        //Retrieve wallet object of sender
+        let senderWallet = WalletList.default.wallets.filter((x) => { return x.publicKey === req.body.sender; });
+        if (senderWallet.length > 0) {
+            let response = senderWallet[0].sendAsset(req.body.recipient, req.body.asset);
+            if (!response.error) {
+                let innerResponse = BlockChain.default.blockchain[BlockChain.default.blockchain.length - 1].addTransaction(response.transaction);
+                res.status(innerResponse.error ? 400 : 200).send(innerResponse);
+            }
+            else {
+                res.status(400).send(response);
+            }
+        }
+        else {
+            res.status(400).send({
+                message: "Sender not found in list"
+            });
+        }
     }
     else {
         res.contentType('application/json');

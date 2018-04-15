@@ -34,12 +34,15 @@ class Block {
         if (!transaction) {
             return { error: true, message: "TRANSACTION_DATA_MISSING" };
         }
-        else if (!transaction.processTransaction()) {
-            return { error: true, message: "CANNOT_PROCESS_TRANSACTION" };
-        }
         else {
-            this.transactions.push(transaction);
-            return { error: false, message: "TRANSACTION_ADDED" };
+            let status = transaction.processTransaction();
+            if (status.error) {
+                return { error: true, message: status.message };
+            }
+            else {
+                this.transactions.push(transaction);
+                return { error: false, message: "TRANSACTION_ADDED" };
+            }
         }
     }
 }

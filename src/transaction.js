@@ -42,9 +42,9 @@ class Transaction {
         }
 
         //Gather transaction inputs (Make sure they are unspent):
-        this.inputs.map((x) => {
-            x.UTXO = Blockchain.UTXOs.get(x.transactionOutputId);
-        });
+        for (let i = 0; i < this.inputs.length; i++) {
+            this.inputs[i].UTXO = Blockchain.UTXOs.get(this.inputs[i].transactionOutputId);
+        }
 
         //Input assets
         let inputAssets = this.getInputAssets();
@@ -53,15 +53,13 @@ class Transaction {
         }
 
         //Get asset to be sent to recipient
-        let asset = inputAssets.filter((x) => { x.id === this.asset._id; })[0];
+        let asset = inputAssets.filter((x) => { return x._id === this.asset._id; })[0];
 
         if (asset) {
             //generate transaction outputs:
             let transactionId = this.calulateTransactionHash();
             this.transactionId = transactionId;
             this.outputs.push(new TransactionOutput(this.recipient, [asset], transactionId)); //Send asset to recipient
-            let remainingAssets = inputAssets.filter((x) => { x.id !== this.asset._id; }); //Get remaining assets
-            this.outputs.push(new TransactionOutput(this.sender, remainingAssets, transactionId));//Send remaining assets to sender
 
             //Add unspent assets
             this.outputs.map((x) => {
@@ -70,7 +68,7 @@ class Transaction {
 
             //Remove spent assets
             this.inputs.map((x) => {
-                Blockchain.UTXOs.delete(x.id);
+                Blockchain.UTXOs.delete(x.transactionOutputId);
             });
 
             return { error: false, message: "ASSET_TRANSFERRED" }
