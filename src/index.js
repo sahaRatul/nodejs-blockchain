@@ -123,4 +123,4 @@ app.post('/api/transaction', (req, res) => {
     }
 });
 
-app.listen(5000);
+app.listen(process.env.PORT || 5000);
