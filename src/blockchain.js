@@ -1,9 +1,9 @@
-import Block from './block';
+//import Block from './block';
 import Utils from './utils';
 
 class Blockchain {
     constructor() {
-        Blockchain.blockchain = [new Block({ _id: Utils.uuid(), message: "Genesis block" }, "0")];
+        Blockchain.blockchain = [];
         Blockchain.UTXOs = new Map();
         this.difficulty = 4;
 

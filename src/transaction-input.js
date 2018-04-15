@@ -4,3 +4,5 @@ class TransactionInput {
         this.UTXO = null;
     }
 }
+
+export default TransactionInput;

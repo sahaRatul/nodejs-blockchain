@@ -71,6 +71,18 @@ class Utils {
     static getMerkleRoot(transactions = []) {
         let count = transactions.length;
         let previousTreeLayer = transactions.map((x) => { return x; });
+        let treeLayer = previousTreeLayer;
+        while (count > 1) {
+            treeLayer = new Array(0);
+            for (let i = 1; i < previousTreeLayer.length; i++) {
+                treeLayer.push(Utils.applySha256(JSON.stringify(previousTreeLayer[i - 1]) + JSON.stringify(previousTreeLayer[i])));
+            }
+            count = treeLayer.length;
+            previousTreeLayer = treeLayer;
+        }
+
+        let merkleTreeRoot = treeLayer.length === 1 ? treeLayer[0] : "";
+        return merkleTreeRoot;
     }
 }
 

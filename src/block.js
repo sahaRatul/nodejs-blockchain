@@ -7,20 +7,22 @@ class Block {
         this.timeStamp = Date.now();
         this.nonce = 0;
         this.transactions = [];
-        this.hash = this.calculateBlockHash(this.previousHash, this.timeStamp, this.nonce, this.data);
+        this.merkleRoot = "";
+        this.hash = this.calculateBlockHash(this.previousHash, this.timeStamp, this.nonce, this.merkleRoot);
 
         this.calculateBlockHash = this.calculateBlockHash.bind(this);
         this.mineBlock = this.mineBlock.bind(this);
     }
 
-    calculateBlockHash(previousHash = this.previousHash, timeStamp = this.timeStamp, nonce = this.nonce, data = this.data) {
+    calculateBlockHash(previousHash = this.previousHash, timeStamp = this.timeStamp, nonce = this.nonce, merkleRoot = this.merkleRoot) {
         return Utils.applySha256(
-            previousHash + timeStamp.toString() + nonce.toString() + JSON.stringify(data)
+            previousHash + timeStamp.toString() + nonce.toString() + merkleRoot
         );
     }
 
     mineBlock(difficulty = 4) {
         let target = new Array(difficulty + 1).join("0");
+        this.merkleRoot = Utils.getMerkleRoot(this.transactions);
         while (this.hash.substring(0, difficulty) !== target) {
             this.nonce++;
             this.hash = this.calculateBlockHash();

@@ -14,3 +14,5 @@ class TransactionOutput {
         return publicKey === this.recipient;
     }
 }
+
+export default TransactionOutput;

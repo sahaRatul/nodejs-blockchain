@@ -2,9 +2,11 @@ let express = require('express');
 let bodyParser = require('body-parser');
 let morgan = require('morgan');
 
+let Assets = require('./assetlist');
 let Block = require('./block');
 let BlockChain = require('./blockchain');
 let Transaction = require('./transaction');
+let TransactionOutput = require('./transaction-output');
 let Utils = require('./utils');
 let Wallet = require('./wallet');
 
@@ -15,6 +17,20 @@ app.use(morgan('dev'));
 let blockchain = new BlockChain.default();
 let coinbase = new Wallet.default();
 
+//Create genesis Transaction
+let genesisTransaction = new Transaction.default(coinbase.publicKey, coinbase.publicKey, Assets.default[0], null);
+genesisTransaction.generateSignature(coinbase.privateKey);
+genesisTransaction.transactionId = "0";
+genesisTransaction.outputs.push(new TransactionOutput.default(genesisTransaction.recipient, [genesisTransaction.asset], genesisTransaction.transactionId));
+BlockChain.default.UTXOs.set(genesisTransaction.outputs[0]._id, genesisTransaction.outputs[0]);
+
+//Create and add genesis block to blockchain
+let genesisBlock = new Block.default({
+    _id: Utils.default.uuid(),
+    message: "Block 0"
+}, "0");
+genesisBlock.addTransaction(genesisTransaction); //Add genesis transaction to genesis block
+blockchain.addBlock(genesisBlock);
 
 app.get('/api/blockchain', (req, res) => {
     res.contentType('application/json');

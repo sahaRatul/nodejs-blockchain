@@ -10,6 +10,7 @@ class Transaction {
         this.inputs = inputs;
         this.outputs = outputs;
         this.signature = null;
+        this.transactionId = "";
 
         this.calulateTransactionHash = this.calulateTransactionHash.bind(this);
         this.generateSignature = this.generateSignature.bind(this);
@@ -57,6 +58,7 @@ class Transaction {
         if (asset) {
             //generate transaction outputs:
             let transactionId = this.calulateTransactionHash();
+            this.transactionId = transactionId;
             this.outputs.push(new TransactionOutput(this.recipient, [asset], transactionId)); //Send asset to recipient
             let remainingAssets = inputAssets.filter((x) => { x.id !== this.asset._id; }); //Get remaining assets
             this.outputs.push(new TransactionOutput(this.sender, remainingAssets, transactionId));//Send remaining assets to sender
