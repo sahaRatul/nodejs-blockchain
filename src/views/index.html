@@ -1,0 +1,60 @@
+<html>
+<h1 id="nodejsblockchainapp">NodeJS Blockchain App</h1>
+
+<h2 id="apireference">API Reference</h2>
+
+<h3 id="get">
+    <code>GET /</code>
+</h3>
+
+<h5 id="returnsthispage">Returns this page.</h5>
+
+<h3 id="getapiblockchain">
+    <code>GET /api/blockchain</code>
+</h3>
+
+<h5 id="returnstheblockchain">Returns the blockchain.</h5>
+
+<h3 id="getapimine">
+    <code>GET /api/mine</code>
+</h3>
+
+<h5 id="verifiestheblockchaininserverupto2ndlatestblockinchainthelastblockisunverified">Verifies the blockchain in server upto 2nd latest block in chain. The last block is unverified.</h5>
+
+<h3 id="getapiisvalid">
+    <code>GET /api/isValid</code>
+</h3>
+
+<h5 id="verifiestheblockchainintegrity">Verifies the blockchain integrity.</h5>
+
+<h3 id="getapiwallet">
+    <code>GET /api/wallet</code>
+</h3>
+
+<h5 id="returnsanewwalletwithwalletwithpublicandprivatekeysthepublickeyisthewalletaddressusedforsendingreceivingandtheprivatekeyisusedtosigntransactionssendbythewallettheprivatekeyshouldbesavedsinceitsnotpossibletoretrieveitoncelost">Returns a new wallet with wallet with public and private keys. The public key is the wallet address used for sending/receiving
+    and the private key is used to sign transactions send by the wallet. The private key should be saved since it's not possible
+    to retrieve it once lost.</h5>
+
+<h3 id="getapiwallets">
+    <code>GET /api/wallets</code>
+</h3>
+
+<h5 id="returnsalistofwalletscurrentlyinappmemorytheprivatekeyisnotsentforsecurity">Returns a list of wallets currently in app memory. The private key is not sent for security.</h5>
+
+<h3 id="getapiwalletbalancekeywallet_public_key">
+    <code>GET /api/wallet/balance?key=&lt;wallet_public_key&gt;</code>
+</h3>
+
+<h5 id="retrievesthebalanceinamountthewalletpublickeyieaddressmustbesentinquerystring">Retrieves the balance in amount. The wallet public key i.e. address must be sent in query string</h5>
+
+<h3 id="postapitransaction">
+    <code>POST /api/transaction</code>
+</h3>
+
+<h5 id="sendassetfromonewallettoanotherthedatamustbesendinrequestbodyandshouldhavebelowformat">Send asset from one wallet to another. The data must be send in request body and should have below format.</h5>
+
+<h5 id="sendersender_public_keyrecipientrecepient_public_keyassetdataprivate_keysender_private_key">
+    <code>{ sender: &lt;sender_public_key&gt;, recipient: &lt;recepient_public_key&gt;, asset: &lt;data&gt;, private_key: &lt;sender_private_key&gt;}</code>
+</h5>
+
+</html>

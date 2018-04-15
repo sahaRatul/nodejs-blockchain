@@ -39,6 +39,11 @@ let genesisBlock = new Block.default({
 genesisBlock.addTransaction(genesisTransaction); //Add genesis transaction to genesis block
 blockchain.addBlock(genesisBlock);
 
+app.get('/', (req, res) => {
+    // eslint-disable-next-line no-undef
+    res.sendFile('index.html', { root: __dirname });
+});
+
 app.get('/api/blockchain', (req, res) => {
     res.contentType('application/json');
     res.send(blockchain.getChain());
