@@ -15,7 +15,7 @@ class Wallet {
         let count = 0;
         for (let [key, value] of Blockchain.UTXOs) {
             if (value.isMine(publicKey)) {
-                this.UTXOs.set(key, value);
+                this.UTXOs ? this.UTXOs.set(key, value) : () => { };
                 count++;
             }
         }

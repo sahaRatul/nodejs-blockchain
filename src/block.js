@@ -34,9 +34,6 @@ class Block {
         if (!transaction) {
             return { error: true, message: "TRANSACTION_DATA_MISSING" };
         }
-        else if (this.previousHash === "0") {
-            return { error: true, message: "CANNOT_ADD_GENESIS_BLOCK" };
-        }
         else if (!transaction.processTransaction()) {
             return { error: true, message: "CANNOT_PROCESS_TRANSACTION" };
         }

@@ -7,7 +7,7 @@ class Transaction {
         this.sender = sender;
         this.recipient = recipient;
         this.asset = asset;
-        this.inputs = inputs;
+        this.inputs = inputs ? inputs : [];
         this.outputs = outputs;
         this.signature = null;
         this.transactionId = "";
@@ -28,7 +28,7 @@ class Transaction {
         );
     }
 
-    generateSignature(sender = this.sender, recipient = this.recipient, asset = this.asset, privateKey = "") {
+    generateSignature(privateKey = "", sender = this.sender, recipient = this.recipient, asset = this.asset) {
         if (privateKey) {
             let data = sender + recipient + JSON.stringify(asset);
             this.signature = Utils.applyECDSASignature(privateKey, data);
@@ -83,7 +83,7 @@ class Transaction {
     getInputAssets() {
         let assets = this.inputs.reduce((acc, val) => {
             return acc.concat(val.UTXO ? val.UTXO.assets : []);
-        });
+        }, []);
         return assets;
     }
 

@@ -1,4 +1,4 @@
-let assets = [
+module.exports = [
     {
         _id: "1234",
         type: "Item 1"
@@ -24,5 +24,3 @@ let assets = [
         type: "Item 6"
     }
 ];
-
-export default assets;

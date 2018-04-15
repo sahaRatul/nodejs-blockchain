@@ -1,3 +1,7 @@
+require('babel-register')({
+    presets: ['env']
+});
+
 let express = require('express');
 let bodyParser = require('body-parser');
 let morgan = require('morgan');
@@ -18,11 +22,11 @@ let blockchain = new BlockChain.default();
 let coinbase = new Wallet.default();
 
 //Create genesis Transaction
-let genesisTransaction = new Transaction.default(coinbase.publicKey, coinbase.publicKey, Assets.default[0], null);
+let genesisTransaction = new Transaction.default(coinbase.publicKey, coinbase.publicKey, Assets[0], null);
 genesisTransaction.generateSignature(coinbase.privateKey);
 genesisTransaction.transactionId = "0";
 genesisTransaction.outputs.push(new TransactionOutput.default(genesisTransaction.recipient, [genesisTransaction.asset], genesisTransaction.transactionId));
-BlockChain.default.UTXOs.set(genesisTransaction.outputs[0]._id, genesisTransaction.outputs[0]);
+BlockChain.default.UTXOs.set(genesisTransaction.outputs[0].id, genesisTransaction.outputs[0]);
 
 //Create and add genesis block to blockchain
 let genesisBlock = new Block.default({
