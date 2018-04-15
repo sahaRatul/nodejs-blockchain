@@ -1,8 +1,6 @@
 # NodeJS Blockchain App
-=====================
 
 ## API Reference
--------------
 
 ### `GET /`
 
@@ -36,4 +34,4 @@
 
 ##### Send asset from one wallet to another. The data must be send in request body and should have below format.
 
-##### `{ sender: <sender_public_key>, recipient: <recepient_public_key>, asset: <data>, private_key: <sender_private_key>}`
+##### `{ sender: <sender_public_key>, recipient: <recepient_public_key>, asset: <data>, private_key: <sender_private_key> }`
