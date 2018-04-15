@@ -30,11 +30,13 @@ class Wallet {
         let inputs = [];
         for (let [key, value] of this.UTXOs) {
             inputs.push(value);
+            key;
             let len = value.assets.filter((x) => { x._id === asset._id });
             if (len > 0) break;
         }
 
-        let newTransaction = new Transaction(this.publicKey, recipient, asset, inputs)
+        let newTransaction = new Transaction(this.publicKey, recipient, asset, inputs);
+        return newTransaction;
     }
 }
 

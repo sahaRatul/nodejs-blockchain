@@ -97,7 +97,7 @@ class Transaction {
     verifySignature(sender = this.sender, recipient = this.recipient, asset = this.asset, signature = this.signature) {
         if (sender && signature) {
             let data = sender + recipient + JSON.stringify(asset);
-            return Utils.verifyECDSASignature(sender, data, signature)
+            return Utils.verifyECDSASignature(sender, data, signature);
         }
         return false;
     }

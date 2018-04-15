@@ -27,6 +27,24 @@ class Utils {
         return uuid.join('');
     }
 
+    // Convert a hex string to a byte array
+    static hexToBytes(hex) {
+        let bytes = [];
+        for (let c = 0; c < hex.length; c += 2)
+            bytes.push(parseInt(hex.substr(c, 2), 16));
+        return bytes;
+    }
+
+    // Convert a byte array to a hex string
+    static bytesToHex(bytes) {
+        let hex = [];
+        for (let i = 0; i < bytes.length; i++) {
+            hex.push((bytes[i] >>> 4).toString(16));
+            hex.push((bytes[i] & 0xF).toString(16));
+        }
+        return hex.join("");
+    }
+
     static generateKeyPair() {
         let ec = new EC('secp256k1');
         let key = ec.genKeyPair();
@@ -51,19 +69,19 @@ class Utils {
 
             //Export DER encoded signature in Array
             let derSign = signature.toDER();
-            return derSign;
+            return Utils.bytesToHex(derSign);
         }
         return null;
     }
 
-    static verifyECDSASignature(publicKey = "", input = "", signature = []) {
-        if (signature.length !== 0 && publicKey) {
+    static verifyECDSASignature(publicKey = "", input = "", signature = "") {
+        if (signature && publicKey) {
             let ec = new EC('secp256k1');
             let key = ec.keyFromPublic(publicKey, 'hex');
             //Convert input to byte array
             let inputBytes = input.split('').map((x) => { return x.charCodeAt(0); });
 
-            return key.verify(inputBytes, new Buffer(signature));
+            return key.verify(inputBytes, signature);
         }
         return false;
     }
@@ -71,7 +89,7 @@ class Utils {
     static getMerkleRoot(transactions = []) {
         let count = transactions.length;
         let previousTreeLayer = transactions.map((x) => { return x; });
-        let treeLayer = previousTreeLayer;
+        let treeLayer = [Utils.applySha256(JSON.stringify(previousTreeLayer[0]))];
         while (count > 1) {
             treeLayer = new Array(0);
             for (let i = 1; i < previousTreeLayer.length; i++) {

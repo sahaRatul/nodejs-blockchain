@@ -13,13 +13,16 @@ let Transaction = require('./transaction');
 let TransactionOutput = require('./transaction-output');
 let Utils = require('./utils');
 let Wallet = require('./wallet');
+let WalletList = require('./wallet-list');
 
 let app = express();
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 
 let blockchain = new BlockChain.default();
-let coinbase = new Wallet.default();
+let coinbase = new Wallet.default(); //Default wallet
+
+WalletList.default.wallets = [{ _id: coinbase._id, publicKey: coinbase.publicKey }];
 
 //Create genesis Transaction
 let genesisTransaction = new Transaction.default(coinbase.publicKey, coinbase.publicKey, Assets[0], null);
@@ -52,7 +55,7 @@ app.get('/api/mine', (req, res) => {
     let chain = blockchain.getChain();
     let last_block = chain[chain.length - 1];
 
-    let nonce = last_block.mineBlock();
+    last_block.mineBlock();
 
     //Automatically add a new block to blockchain
     let secondBlock = new Block.default({
@@ -72,7 +75,15 @@ app.get('/api/mine', (req, res) => {
 app.get('/api/wallet', (req, res) => {
     let wallet = new Wallet.default();
     res.contentType('application/json');
+    let walletList = WalletList.default.wallets;
+    walletList.push({ _id: wallet._id, publicKey: wallet.publicKey });
+    WalletList.default.wallets = walletList;
     res.send(wallet);
+});
+
+app.get('/api/wallets', (req, res) => {
+    res.contentType('application/json');
+    res.send(WalletList.default.wallets);
 });
 
 app.get('/api/wallet/balance', (req, res) => {
@@ -112,6 +123,4 @@ app.post('/api/transaction', (req, res) => {
     }
 });
 
-app.listen(5000, () => {
-    console.log('\nBlockchain Application listening on port 5000');
-});
+app.listen(5000);

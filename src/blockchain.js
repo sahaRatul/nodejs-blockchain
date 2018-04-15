@@ -1,6 +1,3 @@
-//import Block from './block';
-import Utils from './utils';
-
 class Blockchain {
     constructor() {
         Blockchain.blockchain = [];
@@ -17,9 +14,9 @@ class Blockchain {
             this._blockchain = [];
         }
         return this._blockchain;
-    };
+    }
 
-    static set blockchain(val) { this._blockchain = val; };
+    static set blockchain(val) { this._blockchain = val; }
 
     static get UTXOs() {
         if (!this._UTXOs) {
@@ -27,7 +24,7 @@ class Blockchain {
         }
         return this._UTXOs;
     }
-    static set UTXOs(value) { this._UTXOs = value; };
+    static set UTXOs(value) { this._UTXOs = value; }
 
     static get minTransactionQuantity() {
         if (!this.minQuantity) {
@@ -57,15 +54,12 @@ class Blockchain {
             previousBlock = Blockchain.blockchain[i - 1];
 
             if (currentBlock.hash !== currentBlock.calculateBlockHash()) {
-                console.log("Hash mismatch");
                 return false;
             }
             if (currentBlock.previousHash !== previousBlock.calculateBlockHash()) {
-                console.log("Hash mismatch");
                 return false;
             }
             if (currentBlock.hash.substr(0, difficulty) !== target) {
-                console.log("This block hasn't been mined");
                 return false;
             }
         }
