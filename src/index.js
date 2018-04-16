@@ -22,11 +22,6 @@ app.use(morgan('dev'));
 let blockchain = new BlockChain.default();
 let coinbase = new Wallet.default(); //Default wallet
 
-// eslint-disable-next-line no-console
-console.log(coinbase.publicKey);
-// eslint-disable-next-line no-console
-console.log(coinbase.privateKey);
-
 WalletList.default.wallets = [coinbase];
 
 //Create genesis Transaction
@@ -140,8 +135,12 @@ app.post('/api/transaction', (req, res) => {
 });
 
 // eslint-disable-next-line no-undef
-let port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 5000, ip = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
-app.listen(port, ip, () => {
+let port = process.env.PORT || 5000;
+app.listen(port, () => {
     // eslint-disable-next-line no-console
-    console.log('Application listening on ' + ip + ':' + port);
+    console.log('\nApp listening on port ' + port + '\n');
+    // eslint-disable-next-line no-console
+    console.log(coinbase.publicKey);
+    // eslint-disable-next-line no-console
+    console.log(coinbase.privateKey);
 });
