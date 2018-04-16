@@ -140,4 +140,9 @@ app.post('/api/transaction', (req, res) => {
 });
 
 // eslint-disable-next-line no-undef
-app.listen(process.env.PORT || 5000);
+let port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 5000;
+let ip = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+app.listen(port, ip, () => {
+    // eslint-disable-next-line no-console
+    console.log('Application listening on ' + ip + ':' + port);
+});
