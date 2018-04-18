@@ -109,6 +109,7 @@ module.exports = {
             }
         ],
         "line-comment-position": "off",
+        "no-console": "off",
         "lines-around-comment": "error",
         "lines-around-directive": "error",
         "lines-between-class-members": "off",

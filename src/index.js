@@ -9,6 +9,7 @@ let morgan = require('morgan');
 let Assets = require('./assetlist');
 let Block = require('./block');
 let BlockChain = require('./blockchain');
+let Nodes = require('./nodes');
 let Transaction = require('./transaction');
 let TransactionOutput = require('./transaction-output');
 let Utils = require('./utils');
@@ -19,8 +20,14 @@ let app = express();
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 
+let http_port = 3000 + Math.floor(Math.random() * 10);
+let node_port = 18070 + Math.floor(Math.random() * 30);
+// eslint-disable-next-line no-undef
+let port = process.env.PORT || http_port;
+
 let blockchain = new BlockChain.default();
 let coinbase = new Wallet.default(); //Default wallet
+let nodes = new Nodes.default(node_port);
 
 WalletList.default.wallets = [coinbase];
 
@@ -35,20 +42,23 @@ BlockChain.default.UTXOs.set(genesisTransaction.outputs[0].id, genesisTransactio
 let genesisBlock = new Block.default({
     _id: Utils.default.uuid(),
     message: "Block 0"
-}, "0");
+}, "0", 0);
 genesisBlock.addTransaction(genesisTransaction); //Add genesis transaction to genesis block
 blockchain.addBlock(genesisBlock);
 
+//GET /
 app.get('/', (req, res) => {
     // eslint-disable-next-line no-undef
     res.sendFile('index.html', { root: __dirname });
 });
 
+//GET /api/blockchain
 app.get('/api/blockchain', (req, res) => {
     res.contentType('application/json');
     res.send(blockchain.getChain());
 });
 
+//GET /api/isValid
 app.get('/api/isValid', (req, res) => {
     res.contentType('application/json');
     res.send({
@@ -56,6 +66,7 @@ app.get('/api/isValid', (req, res) => {
     });
 });
 
+//GET /api/mine
 app.get('/api/mine', (req, res) => {
     let chain = blockchain.getChain();
     let last_block = chain[chain.length - 1];
@@ -66,8 +77,9 @@ app.get('/api/mine', (req, res) => {
     let secondBlock = new Block.default({
         _id: Utils.default.uuid(),
         message: "Block " + (chain.length + 1).toString()
-    }, last_block.hash);
+    }, last_block.hash, chain.length);
     blockchain.addBlock(secondBlock);
+    nodes.broadcastMessage("BLOCK", secondBlock);
 
     res.contentType('application/json');
     res.send({
@@ -77,6 +89,7 @@ app.get('/api/mine', (req, res) => {
     });
 });
 
+//GET /api/wallet
 app.get('/api/wallet', (req, res) => {
     let wallet = new Wallet.default();
     res.contentType('application/json');
@@ -86,12 +99,14 @@ app.get('/api/wallet', (req, res) => {
     res.send(wallet);
 });
 
+//GET /api/wallets
 app.get('/api/wallets', (req, res) => {
     res.contentType('application/json');
     let walletList = WalletList.default.wallets.map((x) => { return { _id: x.id, publicKey: x.publicKey }; })
     res.send(walletList);
 });
 
+//GET /api/wallet/balance
 app.get('/api/wallet/balance', (req, res) => {
     if (req.query.key) {
         res.contentType('application/json');
@@ -106,6 +121,7 @@ app.get('/api/wallet/balance', (req, res) => {
     }
 });
 
+//GET /api/transaction
 app.post('/api/transaction', (req, res) => {
     if (req.body && req.body.sender && req.body.recipient && req.body.asset && req.body.private_key) {
         //Retrieve wallet object of sender
@@ -134,8 +150,24 @@ app.post('/api/transaction', (req, res) => {
     }
 });
 
-// eslint-disable-next-line no-undef
-let port = process.env.PORT || 5000;
+//GET /api/addNode/:port
+app.get('/api/addNode/:host/:port', (req, res) => {
+    if (req.params.host && req.params.port) {
+        let response = nodes.addPeer(req.params.host, req.params.port);
+        if (response.error) {
+            res.status(500).send(response);
+        }
+        else {
+            res.send(response);
+        }
+    }
+    else {
+        res.status(400).send({
+            message: "HOST and PORT must be send in request URL"
+        });
+    }
+});
+
 app.listen(port, () => {
     // eslint-disable-next-line no-console
     console.log('\nApp listening on port ' + port + '\n');

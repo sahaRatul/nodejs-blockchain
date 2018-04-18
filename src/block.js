@@ -1,13 +1,14 @@
 import Utils from './utils';
 
 class Block {
-    constructor(data = {}, previousHash = "") {
+    constructor(data = {}, previousHash = "", index = 0) {
         this.data = data;
         this.previousHash = previousHash;
         this.timeStamp = Date.now();
         this.nonce = 0;
         this.transactions = [];
         this.merkleRoot = "";
+        this.index = index;
         this.hash = this.calculateBlockHash(this.previousHash, this.timeStamp, this.nonce, this.merkleRoot);
 
         this.calculateBlockHash = this.calculateBlockHash.bind(this);

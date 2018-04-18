@@ -49,7 +49,7 @@ class Blockchain {
         let previousBlock = undefined;
         let target = new Array(difficulty + 1).join("0");
 
-        for (let i = 1; i < Blockchain.blockchain.length - 1; i++) {
+        for (let i = 1; i < Blockchain.blockchain.length; i++) {
             currentBlock = Blockchain.blockchain[i];
             previousBlock = Blockchain.blockchain[i - 1];
 
